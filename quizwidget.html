@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Story Quiz Widget | Math-to-Story</title>
+<style>
+  /* =========================================================
+     Preview page chrome — not part of the widget itself.
+  ========================================================= */
+  body {
+    margin: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, sans-serif;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* =========================================================
+     QUIZ WIDGET — copy everything inside #story-quiz-widget
+     (including this <style> block's .quiz-* rules) into your
+     story card markup / stylesheet.
+  ========================================================= */
+  .quiz-widget {
+    width: 100%;
+    max-width: 480px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 1rem;
+    padding: 1.75rem;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  .quiz-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin: 0;
+  }
+
+  .quiz-progress {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+
+  .quiz-question {
+    display: none;
+  }
+
+  .quiz-question.active {
+    display: block;
+  }
+
+  .quiz-question-text {
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .quiz-option {
+    text-align: left;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 0.7rem 1rem;
+    border-radius: 0.6rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+
+  .quiz-option:hover:not(:disabled) {
+    border-color: #38bdf8;
+  }
+
+  .quiz-option:disabled {
+    cursor: default;
+  }
+
+  .quiz-option.correct {
+    background: rgba(52, 211, 153, 0.12);
+    border-color: #34d399;
+    color: #34d399;
+  }
+
+  .quiz-option.incorrect {
+    background: rgba(248, 113, 113, 0.12);
+    border-color: #f87171;
+    color: #f87171;
+  }
+
+  .quiz-explanation {
+    margin-top: 0.9rem;
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    border-radius: 0.6rem;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.825rem;
+    color: #94a3b8;
+    line-height: 1.5;
+    display: none;
+  }
+
+  .quiz-explanation.show {
+    display: block;
+  }
+
+  .quiz-next-btn {
+    margin-top: 1.1rem;
+    background: #38bdf8;
+    color: #0f172a;
+    border: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.55rem;
+    cursor: pointer;
+    display: none;
+  }
+
+  .quiz-next-btn.show {
+    display: inline-block;
+  }
+
+  /* ---------- Summary screen ---------- */
+  .quiz-summary {
+    display: none;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .quiz-summary.active {
+    display: block;
+  }
+
+  .quiz-summary-score {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #38bdf8;
+    margin: 0.25rem 0;
+  }
+
+  .quiz-summary-label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+  }
+
+  .quiz-claim-btn {
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    color: #0f172a;
+    border: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.65rem;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+
+  .quiz-claim-btn:hover { opacity: 0.9; }
+  .quiz-claim-btn:active { transform: scale(0.97); }
+
+  .quiz-claim-btn:disabled {
+    background: #334155;
+    color: #64748b;
+    cursor: default;
+  }
+
+  .quiz-claimed-note {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: #34d399;
+    min-height: 1.1em;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ COPY FROM HERE ============ -->
+  <div class="quiz-widget" id="story-quiz-widget">
+    <div class="quiz-header">
+      <p class="quiz-title">🧠 Quick Check</p>
+      <p class="quiz-progress" id="quiz-progress">Question 1 of 3</p>
+    </div>
+
+    <div id="quiz-questions"></div>
+
+    <div class="quiz-summary" id="quiz-summary">
+      <p class="quiz-summary-label">You scored</p>
+      <p class="quiz-summary-score" id="quiz-score">0 / 3</p>
+      <button class="quiz-claim-btn" id="quiz-claim-btn">🎁 Claim XP</button>
+      <p class="quiz-claimed-note" id="quiz-claimed-note"></p>
+    </div>
+  </div>
+  <!-- ============ COPY TO HERE ============ -->
+
+  <script>
+  /* =========================================================
+     STORY QUIZ WIDGET — vanilla JS, no dependencies.
+     XP is saved to localStorage under "userXP" so the
+     Gamification widget on dashboard.html can read it.
+  ========================================================= */
+  (function () {
+    const XP_PER_CORRECT_ANSWER = 10;
+
+    const QUESTIONS = [
+      {
+        question: "A firefighter's ladder is 13m long and its base sits 5m from the wall. How high up the wall does it reach?",
+        options: ["12m", "10m", "8m", "14m"],
+        correctIndex: 0,
+        explanation: "Using the Pythagorean theorem: height = √(13² − 5²) = √144 = 12m.",
+      },
+      {
+        question: "A coin has a 50% chance of heads. What's the probability of flipping heads twice in a row?",
+        options: ["50%", "100%", "25%", "75%"],
+        correctIndex: 2,
+        explanation: "Independent events multiply: 0.5 × 0.5 = 0.25, or 25%.",
+      },
+      {
+        question: "A ride costs a $2 base fee plus $1.20 per km. What's the total for a 5km ride?",
+        options: ["$6.00", "$8.00", "$7.00", "$10.00"],
+        correctIndex: 1,
+        explanation: "Total = $2 base + ($1.20 × 5km) = $2 + $6 = $8.00.",
+      },
+    ];
+
+    let currentIndex = 0;
+    let correctCount = 0;
+    const answered = new Array(QUESTIONS.length).fill(false);
+
+    const questionsContainer = document.getElementById("quiz-questions");
+    const progressEl = document.getElementById("quiz-progress");
+    const summaryEl = document.getElementById("quiz-summary");
+    const scoreEl = document.getElementById("quiz-score");
+    const claimBtn = document.getElementById("quiz-claim-btn");
+    const claimedNote = document.getElementById("quiz-claimed-note");
+
+    function renderQuestions() {
+      questionsContainer.innerHTML = QUESTIONS.map((q, qIndex) => `
+        <div class="quiz-question ${qIndex === 0 ? "active" : ""}" data-index="${qIndex}">
+          <p class="quiz-question-text">${escapeHTML(q.question)}</p>
+          <div class="quiz-options">
+            ${q.options.map((opt, oIndex) => `
+              <button class="quiz-option" data-q="${qIndex}" data-o="${oIndex}">${escapeHTML(opt)}</button>
+            `).join("")}
+          </div>
+          <div class="quiz-explanation" id="explanation-${qIndex}">${escapeHTML(q.explanation)}</div>
+          <button class="quiz-next-btn" data-next-for="${qIndex}">
+            ${qIndex === QUESTIONS.length - 1 ? "See Results →" : "Next Question →"}
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function handleOptionClick(e) {
+      const btn = e.target.closest(".quiz-option");
+      if (!btn) return;
+
+      const qIndex = Number(btn.dataset.q);
+      const oIndex = Number(btn.dataset.o);
+
+      if (answered[qIndex]) return; // already answered, ignore further clicks
+      answered[qIndex] = true;
+
+      const question = QUESTIONS[qIndex];
+      const isCorrect = oIndex === question.correctIndex;
+      if (isCorrect) correctCount++;
+
+      const questionBlock = questionsContainer.querySelector(`.quiz-question[data-index="${qIndex}"]`);
+      const optionButtons = questionBlock.querySelectorAll(".quiz-option");
+
+      optionButtons.forEach((optBtn) => {
+        optBtn.disabled = true;
+        const thisOIndex = Number(optBtn.dataset.o);
+        if (thisOIndex === question.correctIndex) {
+          optBtn.classList.add("correct");
+        } else if (thisOIndex === oIndex) {
+          optBtn.classList.add("incorrect");
+        }
+      });
+
+      document.getElementById(`explanation-${qIndex}`).classList.add("show");
+      questionBlock.querySelector(".quiz-next-btn").classList.add("show");
+    }
+
+    function handleNextClick(e) {
+      const btn = e.target.closest(".quiz-next-btn");
+      if (!btn) return;
+
+      const qIndex = Number(btn.dataset.nextFor);
+      const currentBlock = questionsContainer.querySelector(`.quiz-question[data-index="${qIndex}"]`);
+      currentBlock.classList.remove("active");
+
+      if (qIndex + 1 < QUESTIONS.length) {
+        currentIndex = qIndex + 1;
+        questionsContainer.querySelector(`.quiz-question[data-index="${currentIndex}"]`).classList.add("active");
+        progressEl.textContent = `Question ${currentIndex + 1} of ${QUESTIONS.length}`;
+      } else {
+        showSummary();
+      }
+    }
+
+    function showSummary() {
+      progressEl.textContent = "Complete";
+      scoreEl.textContent = `${correctCount} / ${QUESTIONS.length}`;
+      summaryEl.classList.add("active");
+    }
+
+    function claimXP() {
+      const earned = correctCount * XP_PER_CORRECT_ANSWER;
+
+      let currentXP = 0;
+      try {
+        currentXP = parseInt(localStorage.getItem("userXP"), 10) || 0;
+        localStorage.setItem("userXP", String(currentXP + earned));
+      } catch (err) {
+        console.warn("Could not save XP to localStorage:", err);
+      }
+
+      claimBtn.disabled = true;
+      claimBtn.textContent = "✓ XP Claimed";
+      claimedNote.textContent = `+${earned} XP added — you now have ${currentXP + earned} XP total.`;
+    }
+
+    questionsContainer.addEventListener("click", (e) => {
+      handleOptionClick(e);
+      handleNextClick(e);
+    });
+
+    claimBtn.addEventListener("click", claimXP);
+
+    renderQuestions();
+  })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gamification Widget | Math-to-Story</title>
+<style>
+  body {
+    margin: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, sans-serif;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* =========================================================
+     GAMIFICATION WIDGET — copy #gamification-widget (and the
+     .gw-* styles below) into dashboard.html.
+  ========================================================= */
+  .gw-wrap {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .gw-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 1rem;
+    padding: 1.6rem 1.75rem;
+  }
+
+  .gw-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin: 0 0 1.1rem;
+  }
+
+  /* ---------- XP + Level ---------- */
+  .gw-xp-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .gw-xp-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #38bdf8;
+  }
+
+  .gw-xp-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  .gw-level-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #0f172a;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+  }
+
+  .gw-xp-track {
+    width: 100%;
+    height: 0.5rem;
+    background: #0b1322;
+    border: 1px solid #334155;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .gw-xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0ea5c7, #38bdf8);
+    border-radius: 999px;
+    width: 0%;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .gw-xp-next {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  /* ---------- Badges ---------- */
+  .gw-badges-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+  }
+
+  .gw-badge {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 0.75rem;
+    padding: 1rem 0.6rem;
+    text-align: center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .gw-badge-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .gw-badge-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    line-height: 1.3;
+  }
+
+  .gw-badge-req {
+    font-size: 0.65rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+  }
+
+  .gw-badge.locked {
+    opacity: 0.4;
+    filter: grayscale(0.6);
+  }
+
+  .gw-badge.unlocked {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3), 0 0 18px rgba(56, 189, 248, 0.15);
+  }
+
+  /* ---------- Leaderboard ---------- */
+  .gw-leaderboard {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .gw-leaderboard th {
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 600;
+    padding: 0 0 0.6rem;
+    border-bottom: 1px solid #334155;
+  }
+
+  .gw-leaderboard td {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #1e293b;
+    font-size: 0.875rem;
+  }
+
+  .gw-leaderboard tr:last-child td {
+    border-bottom: none;
+  }
+
+  .gw-rank {
+    font-weight: 700;
+    width: 2rem;
+  }
+
+  .gw-player {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .gw-player-avatar {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+  }
+
+  .gw-player-name {
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  .gw-score {
+    text-align: right;
+    font-weight: 700;
+    color: #38bdf8;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ COPY FROM HERE ============ -->
+  <div class="gw-wrap" id="gamification-widget">
+
+    <!-- XP + Level -->
+    <div class="gw-card">
+      <div class="gw-xp-top">
+        <div>
+          <div class="gw-xp-value" id="gw-xp-value">0</div>
+          <div class="gw-xp-label">Total XP</div>
+        </div>
+        <div class="gw-level-badge" id="gw-level-badge">Level 1</div>
+      </div>
+      <div class="gw-xp-track"><div class="gw-xp-fill" id="gw-xp-fill"></div></div>
+      <p class="gw-xp-next" id="gw-xp-next"></p>
+    </div>
+
+    <!-- Badges -->
+    <div class="gw-card">
+      <p class="gw-section-title">🏅 Badges</p>
+      <div class="gw-badges-grid" id="gw-badges-grid"></div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="gw-card">
+      <p class="gw-section-title">🏆 Leaderboard</p>
+      <table class="gw-leaderboard">
+        <thead>
+          <tr><th>Rank</th><th>Learner</th><th style="text-align:right">XP</th></tr>
+        </thead>
+        <tbody id="gw-leaderboard-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+  <!-- ============ COPY TO HERE ============ -->
+
+  <script>
+  /* =========================================================
+     GAMIFICATION WIDGET — vanilla JS.
+     XP is read from localStorage("userXP"), the same key the
+     Story Quiz widget writes to. Defaults to 150 if unset.
+  ========================================================= */
+  (function () {
+    const LEVELS = [
+      { threshold: 0, title: "Novice" },
+      { threshold: 100, title: "Explorer" },
+      { threshold: 300, title: "Strategist" },
+      { threshold: 600, title: "Math Wizard" },
+      { threshold: 1000, title: "Legend" },
+    ];
+
+    const BADGES = [
+      { id: "explorer", icon: "📖", name: "Story Explorer", requirement: "50 XP", threshold: 50 },
+      { id: "trigo", icon: "📐", name: "Trigo Master", requirement: "200 XP", threshold: 200 },
+      { id: "wizard", icon: "🧙‍♂️", name: "Math Wizard", requirement: "500 XP", threshold: 500 },
+    ];
+
+    const LEADERBOARD = [
+      { rank: 1, medal: "🥇", name: "Ayesha", xp: 820 },
+      { rank: 2, medal: "🥈", name: "Rahim", xp: 640 },
+      { rank: 3, medal: "🥉", name: "Nadia", xp: 510 },
+    ];
+
+    function getXP() {
+      try {
+        const raw = localStorage.getItem("userXP");
+        return raw !== null ? parseInt(raw, 10) || 0 : 150; // default 150 XP
+      } catch (err) {
+        return 150;
+      }
+    }
+
+    function getLevelInfo(xp) {
+      let current = LEVELS[0];
+      let currentIndex = 0;
+      for (let i = 0; i < LEVELS.length; i++) {
+        if (xp >= LEVELS[i].threshold) {
+          current = LEVELS[i];
+          currentIndex = i;
+        }
+      }
+      const next = LEVELS[currentIndex + 1] || null;
+      return { levelNumber: currentIndex + 1, title: current.title, next };
+    }
+
+    function renderXP() {
+      const xp = getXP();
+      const { levelNumber, title, next } = getLevelInfo(xp);
+
+      document.getElementById("gw-xp-value").textContent = xp;
+      document.getElementById("gw-level-badge").textContent = `Level ${levelNumber} ${title}`;
+
+      const fill = document.getElementById("gw-xp-fill");
+      const nextLabel = document.getElementById("gw-xp-next");
+
+      if (next) {
+        const prevThreshold = LEVELS[levelNumber - 1].threshold;
+        const span = next.threshold - prevThreshold;
+        const progressed = xp - prevThreshold;
+        const percent = Math.min(100, Math.round((progressed / span) * 100));
+        requestAnimationFrame(() => { fill.style.width = `${percent}%`; });
+        nextLabel.textContent = `${next.threshold - xp} XP to Level ${levelNumber + 1} (${next.title})`;
+      } else {
+        requestAnimationFrame(() => { fill.style.width = "100%"; });
+        nextLabel.textContent = "Max level reached!";
+      }
+
+      return xp;
+    }
+
+    function renderBadges(xp) {
+      const grid = document.getElementById("gw-badges-grid");
+      grid.innerHTML = BADGES.map((badge) => {
+        const unlocked = xp >= badge.threshold;
+        return `
+          <div class="gw-badge ${unlocked ? "unlocked" : "locked"}">
+            <div class="gw-badge-icon">${badge.icon}</div>
+            <div class="gw-badge-name">${badge.name}</div>
+            <div class="gw-badge-req">${unlocked ? "Unlocked" : badge.requirement}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderLeaderboard() {
+      const tbody = document.getElementById("gw-leaderboard-body");
+      tbody.innerHTML = LEADERBOARD.map((entry) => `
+        <tr>
+          <td class="gw-rank">${entry.medal}</td>
+          <td>
+            <div class="gw-player">
+              <div class="gw-player-avatar">${entry.name.charAt(0)}</div>
+              <span class="gw-player-name">${entry.name}</span>
+            </div>
+          </td>
+          <td class="gw-score">${entry.xp.toLocaleString()}</td>
+        </tr>
+      `).join("");
+    }
+
+    const xp = renderXP();
+    renderBadges(xp);
+    renderLeaderboard();
+  })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trigonometry Simulator | Math-to-Story</title>
+<style>
+  body {
+    margin: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, sans-serif;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* =========================================================
+     TRIG SIMULATOR WIDGET — copy #trig-simulator into your page.
+  ========================================================= */
+  .trig-widget {
+    width: 100%;
+    max-width: 480px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 1rem;
+    padding: 1.75rem;
+  }
+
+  .trig-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+    color: #e2e8f0;
+  }
+
+  .trig-subtitle {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0 0 1.5rem;
+  }
+
+  .trig-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .trig-field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 0.35rem;
+  }
+
+  .trig-field input {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.55rem;
+  }
+
+  .trig-field input:focus {
+    outline: none;
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  }
+
+  .trig-calc-btn {
+    width: 100%;
+    background: #38bdf8;
+    color: #0f172a;
+    border: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 0.7rem;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    transition: opacity 0.15s ease;
+  }
+
+  .trig-calc-btn:hover { opacity: 0.9; }
+
+  .trig-diagram-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .trig-diagram-box svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .trig-result-box {
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 0.65rem;
+    padding: 1rem 1.2rem;
+    text-align: center;
+  }
+
+  .trig-result-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 0.3rem;
+  }
+
+  .trig-result-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #38bdf8;
+  }
+
+  .trig-formula {
+    margin-top: 0.4rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-family: ui-monospace, Menlo, monospace;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ COPY FROM HERE ============ -->
+  <div class="trig-widget" id="trig-simulator">
+    <h3 class="trig-title">📐 Height Simulator</h3>
+    <p class="trig-subtitle">Uses h = d × tan(θ) to find the height of an object</p>
+
+    <div class="trig-inputs">
+      <div class="trig-field">
+        <label for="trig-distance">Distance (m)</label>
+        <input type="number" id="trig-distance" value="20" min="1" step="0.5" />
+      </div>
+      <div class="trig-field">
+        <label for="trig-angle">Angle θ (°)</label>
+        <input type="number" id="trig-angle" value="35" min="1" max="89" step="1" />
+      </div>
+    </div>
+
+    <button class="trig-calc-btn" id="trig-calc-btn">Calculate Height</button>
+
+    <div class="trig-diagram-box">
+      <svg id="trig-svg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+
+    <div class="trig-result-box">
+      <div class="trig-result-label">Calculated Height</div>
+      <div class="trig-result-value" id="trig-result">— m</div>
+      <div class="trig-formula" id="trig-formula-text"></div>
+    </div>
+  </div>
+  <!-- ============ COPY TO HERE ============ -->
+
+  <script>
+  /* =========================================================
+     TRIGONOMETRY HEIGHT SIMULATOR — vanilla JS + inline SVG.
+     h = d × tan(θ × π / 180)
+     The SVG triangle auto-scales so the shape stays roughly
+     proportional to the real d/h ratio, clamped to fit the view.
+  ========================================================= */
+  (function () {
+    const distanceInput = document.getElementById("trig-distance");
+    const angleInput = document.getElementById("trig-angle");
+    const calcBtn = document.getElementById("trig-calc-btn");
+    const resultEl = document.getElementById("trig-result");
+    const formulaEl = document.getElementById("trig-formula-text");
+    const svg = document.getElementById("trig-svg");
+
+    const VIEW_W = 320;
+    const VIEW_H = 220;
+    const BASE_X = 40;   // left edge (observer position)
+    const GROUND_Y = 190; // ground line y
+
+    function calculate() {
+      const distance = parseFloat(distanceInput.value);
+      const angleDeg = parseFloat(angleInput.value);
+
+      if (isNaN(distance) || isNaN(angleDeg) || distance <= 0 || angleDeg <= 0 || angleDeg >= 90) {
+        resultEl.textContent = "⚠️ Invalid input";
+        formulaEl.textContent = "Distance must be > 0 and angle must be between 1° and 89°.";
+        drawDiagram(0, 0);
+        return;
+      }
+
+      const heightRad = angleDeg * (Math.PI / 180);
+      const height = distance * Math.tan(heightRad);
+      const rounded = Number(height.toFixed(2));
+
+      resultEl.textContent = `${rounded} m`;
+      formulaEl.textContent = `h = ${distance} × tan(${angleDeg}°) = ${rounded} m`;
+
+      drawDiagram(distance, height);
+    }
+
+    function drawDiagram(distance, height) {
+      // Scale both distance and height by the SAME factor so the
+      // drawn triangle keeps the real geometric proportions.
+      const maxDrawWidth = VIEW_W - BASE_X - 40;
+      const maxDrawHeight = GROUND_Y - 30;
+
+      let scale = 4; // sensible default when values are 0
+      if (distance > 0 && height > 0) {
+        scale = Math.min(maxDrawWidth / distance, maxDrawHeight / height);
+      } else if (distance > 0) {
+        scale = maxDrawWidth / distance;
+      }
+
+      const drawW = distance * scale;
+      const drawH = height * scale;
+
+      const objX = BASE_X + drawW;
+      const objTopY = GROUND_Y - drawH;
+
+      svg.innerHTML = `
+        <!-- ground -->
+        <line x1="20" y1="${GROUND_Y}" x2="${VIEW_W - 20}" y2="${GROUND_Y}" stroke="#334155" stroke-width="2" />
+
+        <!-- observer -->
+        <circle cx="${BASE_X}" cy="${GROUND_Y}" r="4" fill="#38bdf8" />
+        <text x="${BASE_X}" y="${GROUND_Y + 18}" fill="#94a3b8" font-size="10" text-anchor="middle">You</text>
+
+        <!-- object (tree/building) -->
+        <line x1="${objX}" y1="${GROUND_Y}" x2="${objX}" y2="${objTopY}" stroke="#38bdf8" stroke-width="3" />
+        <circle cx="${objX}" cy="${objTopY}" r="4" fill="#818cf8" />
+
+        <!-- line of sight (hypotenuse) -->
+        <line x1="${BASE_X}" y1="${GROUND_Y}" x2="${objX}" y2="${objTopY}" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3" />
+
+        <!-- distance label -->
+        <text x="${(BASE_X + objX) / 2}" y="${GROUND_Y + 18}" fill="#64748b" font-size="10" text-anchor="middle">${distance || 0} m</text>
+
+        <!-- height label -->
+        <text x="${objX + 10}" y="${(GROUND_Y + objTopY) / 2}" fill="#64748b" font-size="10">${Number((height || 0).toFixed(1))} m</text>
+      `;
+    }
+
+    calcBtn.addEventListener("click", calculate);
+    calculate(); // initial render with default values
+  })();
+  </script>
+
+</body>
+</html>

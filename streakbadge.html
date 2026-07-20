@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Streak Badge | Math-to-Story</title>
+<style>
+  body {
+    margin: 0;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: system-ui, -apple-system, sans-serif;
+    padding: 3rem 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* =========================================================
+     STREAK BADGE — copy #streak-badge into your header/dashboard.
+  ========================================================= */
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #1e293b;
+    border: 1px solid rgba(251, 146, 60, 0.4);
+    color: #fdba74;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    box-shadow: 0 0 12px rgba(251, 146, 60, 0.25);
+    animation: streak-glow 2.2s ease-in-out infinite;
+  }
+
+  .streak-badge .flame {
+    font-size: 1rem;
+    filter: drop-shadow(0 0 4px rgba(251, 146, 60, 0.6));
+  }
+
+  @keyframes streak-glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(251, 146, 60, 0.2); }
+    50%      { box-shadow: 0 0 18px rgba(251, 146, 60, 0.45); }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ COPY FROM HERE ============ -->
+  <div class="streak-badge" id="streak-badge">
+    <span class="flame">🔥</span>
+    <span id="streak-text">— Day Streak!</span>
+  </div>
+  <!-- ============ COPY TO HERE ============ -->
+
+  <script>
+  /* =========================================================
+     DAILY STREAK COUNTER — vanilla JS, localStorage-backed.
+     Keys used:
+       lastVisitDate -> "YYYY-MM-DD" of the most recent visit
+       streakCount   -> current consecutive-day streak
+     Logic:
+       - No previous visit          -> streak = 1
+       - Same calendar day again    -> streak unchanged
+       - Exactly 1 day later        -> streak + 1
+       - More than 1 day later      -> streak resets to 1
+  ========================================================= */
+  (function () {
+    function todayKey() {
+      const now = new Date();
+      // Date-only string, ignores time-of-day so same-day revisits don't double-count
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    }
+
+    function daysBetween(dateKeyA, dateKeyB) {
+      const a = new Date(`${dateKeyA}T00:00:00`);
+      const b = new Date(`${dateKeyB}T00:00:00`);
+      const msPerDay = 24 * 60 * 60 * 1000;
+      return Math.round((b - a) / msPerDay);
+    }
+
+    function updateStreak() {
+      const today = todayKey();
+      let lastVisitDate, streakCount;
+
+      try {
+        lastVisitDate = localStorage.getItem("lastVisitDate");
+        streakCount = parseInt(localStorage.getItem("streakCount"), 10) || 0;
+      } catch (err) {
+        lastVisitDate = null;
+        streakCount = 0;
+      }
+
+      if (!lastVisitDate) {
+        streakCount = 1; // first-ever visit
+      } else {
+        const diff = daysBetween(lastVisitDate, today);
+        if (diff === 0) {
+          // same day — keep streak as-is
+        } else if (diff === 1) {
+          streakCount += 1; // consecutive day
+        } else {
+          streakCount = 1; // missed a day (or more) — reset
+        }
+      }
+
+      try {
+        localStorage.setItem("lastVisitDate", today);
+        localStorage.setItem("streakCount", String(streakCount));
+      } catch (err) {
+        console.warn("Could not save streak to localStorage:", err);
+      }
+
+      return streakCount;
+    }
+
+    function renderBadge(streakCount) {
+      const label = streakCount === 1 ? "Day Streak!" : "Day Streak!";
+      document.getElementById("streak-text").textContent = `${streakCount} ${label}`;
+    }
+
+    renderBadge(updateStreak());
+  })();
+  </script>
+
+</body>
+</html>
