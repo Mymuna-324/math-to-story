@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard | Math-to-Story</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     DESIGN TOKENS
+  ========================================================= */
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-hover: #253449;
+    --border: #334155;
+    --accent: #38bdf8;
+    --accent-dim: #0ea5c7;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-faint: #64748b;
+    --danger: #f87171;
+    --success: #34d399;
+    --radius: 1rem;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* =========================================================
+     HEADER
+  ========================================================= */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 0;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .avatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #818cf8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0f172a;
+    flex-shrink: 0;
+  }
+
+  .greeting h1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .greeting p {
+    margin: 0.1rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.55rem 1.1rem;
+    border-radius: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .btn-home:hover {
+    border-color: var(--accent);
+    background: var(--card-hover);
+  }
+
+  /* =========================================================
+     MAIN LAYOUT
+  ========================================================= */
+  main {
+    padding: 2.5rem 0 4rem;
+  }
+
+  section + section {
+    margin-top: 2.5rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* =========================================================
+     STATS CARDS
+  ========================================================= */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.5rem;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-dim);
+  }
+
+  .stat-icon {
+    font-size: 1.3rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .stat-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+
+  /* =========================================================
+     PROGRESS SECTION
+  ========================================================= */
+  .progress-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.6rem 1.75rem;
+  }
+
+  .progress-row {
+    margin-bottom: 1.3rem;
+  }
+
+  .progress-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .progress-percent {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 0.5rem;
+    background: #0b1322;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%; /* animated to target on load */
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* =========================================================
+     SAVED STORIES LIST
+  ========================================================= */
+  .story-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .story-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.15s ease;
+  }
+
+  .story-item:hover {
+    border-color: var(--accent-dim);
+  }
+
+  .story-item.removing {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+
+  .story-info {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 0;
+  }
+
+  .story-tag {
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .story-title {
+    font-size: 0.925rem;
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .story-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .btn-read, .btn-remove {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.5rem 0.95rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: opacity 0.15s ease, background 0.15s ease;
+  }
+
+  .btn-read {
+    background: var(--accent);
+    color: #0f172a;
+  }
+
+  .btn-read:hover { opacity: 0.85; }
+
+  .btn-remove {
+    background: transparent;
+    color: var(--text-dim);
+    border-color: var(--border);
+  }
+
+  .btn-remove:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--text-faint);
+    font-size: 0.875rem;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* =========================================================
+     RESPONSIVE
+  ========================================================= */
+  @media (max-width: 640px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .story-item { flex-direction: column; align-items: flex-start; }
+    .story-actions { width: 100%; }
+    .btn-read, .btn-remove { flex: 1; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="wrap header-inner">
+      <div class="brand">
+        <div class="avatar" id="avatar-initial">M</div>
+        <div class="greeting">
+          <h1 id="greeting-text">Welcome back, Maisha!</h1>
+          <p>Here's how your math journey is going</p>
+        </div>
+      </div>
+      <a href="index.html" class="btn-home">← Back to Home</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ============ STATS OVERVIEW ============ -->
+    <section>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📖</div>
+          <div class="stat-value" id="stat-stories-read">0</div>
+          <div class="stat-label">Total Stories Read</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-value" id="stat-topics-mastered">0</div>
+          <div class="stat-label">Topics Mastered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔖</div>
+          <div class="stat-value" id="stat-bookmarks">0</div>
+          <div class="stat-label">Saved Bookmarks</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROGRESS ============ -->
+    <section>
+      <h2 class="section-title">📈 Your Progress</h2>
+      <div class="progress-card" id="progress-card"></div>
+    </section>
+
+    <!-- ============ SAVED STORIES ============ -->
+    <section>
+      <h2 class="section-title">🔖 Saved Stories</h2>
+      <div class="story-list" id="story-list"></div>
+    </section>
+
+  </main>
+
+  <script>
+  /* =========================================================
+     MATH-TO-STORY DASHBOARD — vanilla JS, localStorage-backed
+     Everything here is demo/dummy data seeded on first visit,
+     then persisted so refreshes and removals stick.
+  ========================================================= */
+
+  const STORAGE_KEY = "mathToStory.dashboard";
+
+  // Static progress data — swap these numbers for real tracking later
+  const PROGRESS_TOPICS = [
+    { name: "Trigonometry", percent: 80 },
+    { name: "Probability", percent: 60 },
+    { name: "Quadratic Equations", percent: 45 },
+  ];
+
+  // Default/dummy state used the very first time this page loads
+  const DEFAULT_STATE = {
+    userName: "Maisha",
+    storiesRead: 5,
+    topicsMastered: 3,
+    savedStories: [
+      { id: "s1", title: "The Firefighter's Ladder", tag: "Geometry" },
+      { id: "s2", title: "The Win-Streak Bet", tag: "Statistics" },
+      { id: "s3", title: "The Ride-Share Showdown", tag: "Algebra" },
+    ],
+  };
+
+  /* ---------------------------------------------------------
+     PERSISTENCE HELPERS
+  --------------------------------------------------------- */
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : structuredCloneFallback(DEFAULT_STATE);
+    } catch (err) {
+      // Corrupt JSON in localStorage — fail safe with the defaults
+      return structuredCloneFallback(DEFAULT_STATE);
+    }
+  }
+
+  function saveState(state) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (err) {
+      console.warn("Could not save dashboard state:", err);
+    }
+  }
+
+  // Small helper since structuredClone isn't available everywhere
+  function structuredCloneFallback(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  let state = loadState();
+
+  /* ---------------------------------------------------------
+     LOGIN INFO — set by login.html on sign-in. Falls back to
+     "Learner" if the person never went through login.html
+     (e.g. opened dashboard.html directly).
+  --------------------------------------------------------- */
+  function applyLoggedInUser() {
+    let loggedInUsername = "";
+    try {
+      loggedInUsername = (localStorage.getItem("mathToStory.username") || "").trim();
+    } catch (err) {
+      loggedInUsername = "";
+    }
+    state.userName = loggedInUsername || "Learner";
+  }
+
+  /* ---------------------------------------------------------
+     HEADER — greeting + avatar initial
+  --------------------------------------------------------- */
+  function renderHeader() {
+    document.getElementById("greeting-text").textContent = `Welcome back, ${state.userName}!`;
+    document.getElementById("avatar-initial").textContent = state.userName.charAt(0).toUpperCase();
+  }
+
+  /* ---------------------------------------------------------
+     STATS CARDS
+  --------------------------------------------------------- */
+  function renderStats() {
+    document.getElementById("stat-stories-read").textContent = state.storiesRead;
+    document.getElementById("stat-topics-mastered").textContent = state.topicsMastered;
+    document.getElementById("stat-bookmarks").textContent = state.savedStories.length;
+  }
+
+  /* ---------------------------------------------------------
+     PROGRESS BARS (animated fill on load)
+  --------------------------------------------------------- */
+  function renderProgress() {
+    const card = document.getElementById("progress-card");
+    card.innerHTML = PROGRESS_TOPICS.map((topic, i) => `
+      <div class="progress-row">
+        <div class="progress-top">
+          <span class="progress-name">${escapeHTML(topic.name)}</span>
+          <span class="progress-percent">${topic.percent}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill-${i}" style="width:0%"></div>
+        </div>
+      </div>
+    `).join("");
+
+    // Animate bars to their target width just after paint
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        PROGRESS_TOPICS.forEach((topic, i) => {
+          const fill = document.getElementById(`progress-fill-${i}`);
+          if (fill) fill.style.width = `${topic.percent}%`;
+        });
+      }, 100);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     SAVED STORIES LIST
+  --------------------------------------------------------- */
+  function renderSavedStories() {
+    const list = document.getElementById("story-list");
+
+    if (state.savedStories.length === 0) {
+      list.innerHTML = `<div class="empty-state">No saved stories yet — go explore a concept and bookmark one!</div>`;
+      return;
+    }
+
+    list.innerHTML = state.savedStories.map((story) => `
+      <div class="story-item" data-id="${story.id}">
+        <div class="story-info">
+          <span class="story-tag">${escapeHTML(story.tag)}</span>
+          <span class="story-title">${escapeHTML(story.title)}</span>
+        </div>
+        <div class="story-actions">
+          <button class="btn-read" data-action="read" data-id="${story.id}">▶ Read Again</button>
+          <button class="btn-remove" data-action="remove" data-id="${story.id}">✕ Remove</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  /* ---------------------------------------------------------
+     INTERACTIONS — event delegation, one listener for the list
+  --------------------------------------------------------- */
+  function handleStoryListClick(e) {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+
+    if (action === "remove") {
+      removeStory(id);
+    } else if (action === "read") {
+      readStoryAgain(id);
+    }
+  }
+
+  function removeStory(id) {
+    const item = document.querySelector(`.story-item[data-id="${id}"]`);
+    if (!item) return;
+
+    // Play a quick fade/slide-out, then actually remove it from state
+    item.classList.add("removing");
+
+    setTimeout(() => {
+      state.savedStories = state.savedStories.filter((s) => s.id !== id);
+      saveState(state);
+      renderStats();
+      renderSavedStories();
+    }, 220);
+  }
+
+  function readStoryAgain(id) {
+    const story = state.savedStories.find((s) => s.id === id);
+    if (!story) return;
+
+    // Demo interaction: bump the "stories read" counter, then head
+    // back to the main app. Swap this for a real deep link when the
+    // story pages support one (e.g. index.html?story=<id>).
+    state.storiesRead += 1;
+    saveState(state);
+    renderStats();
+
+    window.location.href = "index.html";
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ---------------------------------------------------------
+     INIT
+  --------------------------------------------------------- */
+  document.addEventListener("DOMContentLoaded", () => {
+    applyLoggedInUser();
+    renderHeader();
+    renderStats();
+    renderProgress();
+    renderSavedStories();
+
+    document.getElementById("story-list").addEventListener("click", handleStoryListClick);
+  });
+  </script>
+
+</body>
+</html>
