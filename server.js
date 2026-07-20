@@ -14,7 +14,7 @@
  * Run:
  *   npm install
  *   npm start
- *   -> http://localhost:5500
+ *   -> https://math-to-story.onrender.com
  */
 
 const path = require('path');
