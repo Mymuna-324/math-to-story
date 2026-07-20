@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math-to-Story | Learn Math Through Real-World Stories</title>
+<style>
+  :root{
+    --navy:#0e1428;
+    --navy-2:#141b36;
+    --bg:#f4f5f9;
+    --card:#ffffff;
+    --ink:#1b1f2b;
+    --muted:#6b7280;
+    --indigo:#5b4fe0;
+    --indigo-dark:#4438c9;
+    --indigo-tint:#eef0ff;
+    --border:#e7e8f0;
+    --green-tint:#e9f7ee;
+    --green-ink:#1f9d55;
+    --shadow: 0 8px 24px rgba(20,20,50,0.06);
+    --shadow-hover: 0 14px 32px rgba(20,20,50,0.10);
+    --radius: 18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  button{font-family:inherit;}
+
+  /* ---------- Header ---------- */
+  header.top{
+    background:linear-gradient(180deg,var(--navy),var(--navy-2));
+    color:#fff;
+    padding:22px 40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{display:flex;align-items:center;gap:12px;font-size:26px;font-weight:800;letter-spacing:-0.01em;}
+  .brand .mark{
+    width:38px;height:38px;border-radius:10px;
+    background:rgba(255,255,255,0.08);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+  }
+  .brand .dash{color:var(--indigo);}
+  header.top .tagline{color:#aab0c6;font-size:14px;}
+
+  main{max-width:1100px;margin:0 auto;padding:48px 24px 80px;}
+
+  /* ---------- Grid page ---------- */
+  .page-title{text-align:center;font-size:34px;font-weight:800;margin:0 0 10px;}
+  .page-sub{text-align:center;color:var(--muted);font-size:16px;margin:0 0 40px;}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:22px;
+  }
+  @media (max-width:820px){ .grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:26px 24px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease;
+    text-align:left;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);}
+  .card:focus-visible{outline:3px solid var(--indigo);outline-offset:2px;}
+  .card .icon{font-size:30px;line-height:1;margin-bottom:14px;display:block;}
+
+  .tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:5px 12px;
+    border-radius:999px;
+    background:var(--indigo-tint);
+    color:var(--indigo-dark);
+    margin-bottom:12px;
+  }
+  .tag.geometry{background:#e9f7ee;color:#1f9d55;}
+  .tag.statistics{background:#eef0ff;color:#5b4fe0;}
+  .tag.algebra{background:#fff1e8;color:#d9642c;}
+  .tag.custom{background:#fdeef7;color:#c23b8e;}
+
+  .card h3{margin:0 0 10px;font-size:20px;font-weight:800;}
+  .card p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.5;}
+  .card.remove-btn{position:relative;}
+  .card .delete-x{
+    position:absolute;top:14px;right:14px;
+    width:26px;height:26px;border-radius:50%;
+    border:none;background:var(--bg);color:var(--muted);
+    cursor:pointer;font-size:14px;line-height:1;
+  }
+  .card .delete-x:hover{background:#ffe3e3;color:#c23b3b;}
+
+  /* ---------- Story / wizard page ---------- */
+  #story-page{display:none;}
+  .back-link{
+    display:inline-flex;align-items:center;gap:6px;
+    background:none;border:none;color:var(--indigo-dark);
+    font-weight:700;font-size:14.5px;cursor:pointer;margin-bottom:22px;padding:0;
+  }
+  .story-header .tag{margin-bottom:14px;}
+  .story-header h1{margin:0 0 12px;font-size:32px;font-weight:800;display:flex;align-items:center;gap:12px;}
+  .story-header .story-summary{color:var(--muted);font-size:16.5px;line-height:1.6;margin:0 0 28px;max-width:760px;}
+
+  .progress-track{height:6px;background:var(--border);border-radius:999px;overflow:hidden;margin-bottom:0;}
+  .progress-fill{height:100%;background:var(--indigo);width:20%;transition:width .25s ease;}
+
+  .step-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-top:none;
+    border-radius:0 0 var(--radius) var(--radius);
+    padding:40px 44px 34px;
+    box-shadow:var(--shadow);
+    min-height:260px;
+  }
+  .step-meta{color:var(--muted);font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin-bottom:8px;}
+  .step-title{font-size:24px;font-weight:800;margin:0 0 18px;}
+  .step-body{font-size:17px;line-height:1.75;color:#333a4a;}
+  .step-body p{margin:0 0 14px;}
+
+  .step-pane{display:none;}
+  .step-pane.active{display:block;}
+
+  .inline-input{
+    width:5.5em;
+    text-align:center;
+    font:inherit;
+    font-weight:700;
+    color:var(--indigo-dark);
+    background:var(--indigo-tint);
+    border:1.5px solid transparent;
+    border-radius:8px;
+    padding:2px 6px;
+    margin:0 2px;
+  }
+  .inline-input:focus{
+    outline:none;
+    border-color:var(--indigo);
+    background:#fff;
+  }
+  .mirror{font-weight:800;color:var(--indigo-dark);}
+  .result-value{font-size:1.1em;}
+
+  .formula-panel{
+    margin-top:18px;
+    background:#faf9ff;
+    border:1px dashed #d6d2fb;
+    border-radius:14px;
+    padding:18px 20px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:15.5px;
+  }
+  .formula-panel .fp-label{font-family:inherit;text-transform:uppercase;font-size:11px;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;display:block;font-weight:700;}
+  .formula-panel .fp-live{color:var(--indigo-dark);font-weight:700;}
+
+  .answer-box{
+    margin-top:6px;
+    background:linear-gradient(135deg,var(--indigo-tint),#fff);
+    border:1px solid #dcd8fb;
+    border-radius:16px;
+    padding:26px 28px;
+    text-align:center;
+  }
+  .answer-box .big{font-size:40px;font-weight:800;color:var(--indigo-dark);}
+  .answer-box .sub{color:var(--muted);font-size:14px;margin-top:6px;}
+  .status-pill{
+    display:inline-block;font-size:11.5px;font-weight:700;color:var(--muted);
+    margin-left:8px;opacity:0;transition:opacity .15s ease;
+  }
+  .status-pill.show{opacity:1;}
+
+  .payoff-box{
+    background:var(--green-tint);
+    border:1px solid #cdeedd;
+    border-radius:14px;
+    padding:22px 24px;
+    color:#1c5c39;
+    font-size:16.5px;
+    line-height:1.7;
+  }
+
+  .wizard-nav{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:22px;
+  }
+  .nav-btn{
+    border:none;border-radius:12px;padding:12px 22px;font-size:15px;font-weight:700;cursor:pointer;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  .nav-btn:active{transform:scale(.97);}
+  .nav-btn.ghost{background:none;color:var(--ink);}
+  .nav-btn.ghost:disabled{opacity:.35;cursor:not-allowed;}
+  .nav-btn.solid{background:var(--indigo);color:#fff;}
+  .nav-btn.solid:hover{background:var(--indigo-dark);}
+  .nav-btn.finish{background:var(--green-ink);color:#fff;}
+  .nav-btn.finish:hover{background:#187d43;}
+
+  .dots{display:flex;gap:8px;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+  .dot.active{background:var(--indigo);width:22px;border-radius:5px;transition:all .2s ease;}
+
+  .finish-banner{
+    display:none;
+    margin-top:22px;padding:18px 22px;border-radius:14px;
+    background:var(--green-tint);color:#1c5c39;font-weight:700;text-align:center;
+  }
+  .finish-banner.show{display:block;}
+
+  /* ---------- Utility sections ---------- */
+  .section-divider{margin:70px 0 30px;border:none;border-top:1px solid var(--border);}
+  .section-heading{font-size:24px;font-weight:800;margin:0 0 6px;}
+  .section-sub{color:var(--muted);font-size:15px;margin:0 0 26px;}
+
+  .util-card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:30px 32px;margin-bottom:28px;
+  }
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:640px){.form-grid{grid-template-columns:1fr;}}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:13px;font-weight:700;color:#3a3f52;}
+  .field .hint{font-size:12px;color:var(--muted);font-weight:400;}
+  .field input[type=text], .field input[type=number], .field select, .field textarea{
+    border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14.5px;font-family:inherit;
+    background:#fbfbfd;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none;border-color:var(--indigo);background:#fff;}
+  .field textarea{resize:vertical;min-height:56px;}
+
+  .var-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+  .var-row{display:grid;grid-template-columns:1.2fr 1.6fr .8fr .8fr auto;gap:8px;align-items:center;}
+  @media (max-width:700px){.var-row{grid-template-columns:1fr 1fr;}}
+  .var-row input{border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13.5px;}
+  .small-btn{border:1.5px solid var(--border);background:#fff;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;}
+  .small-btn:hover{border-color:var(--indigo);color:var(--indigo-dark);}
+  .icon-btn{border:none;background:#fdeef0;color:#c23b3b;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:14px;}
+
+  .primary-btn{
+    background:var(--indigo);color:#fff;border:none;border-radius:12px;
+    padding:13px 24px;font-size:15px;font-weight:700;cursor:pointer;
+  }
+  .primary-btn:hover{background:var(--indigo-dark);}
+  .form-msg{margin-top:12px;font-size:13.5px;font-weight:600;}
+  .form-msg.ok{color:var(--green-ink);}
+  .form-msg.err{color:#c23b3b;}
+
+  /* Upload workspace */
+  .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
+  @media (max-width:760px){.upload-grid{grid-template-columns:1fr;}}
+  .dropzone{
+    border:2px dashed #cfd0e6;border-radius:16px;padding:34px 20px;text-align:center;
+    color:var(--muted);cursor:pointer;background:#fbfbff;transition:border-color .15s ease, background .15s ease;
+  }
+  .dropzone.drag{border-color:var(--indigo);background:var(--indigo-tint);}
+  .dropzone .dz-icon{font-size:34px;display:block;margin-bottom:10px;}
+  .dropzone input{display:none;}
+  #image-preview{max-width:100%;border-radius:12px;margin-top:16px;display:none;box-shadow:var(--shadow);}
+
+  .workspace-panel{
+    background:#fbfbfd;border:1px solid var(--border);border-radius:14px;padding:20px;min-height:220px;
+  }
+  .workspace-panel h4{margin:0 0 12px;font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+  .ocr-text{font-size:13px;color:#555;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 12px;max-height:110px;overflow:auto;white-space:pre-wrap;margin-bottom:14px;}
+  .num-chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .num-chip{
+    background:var(--indigo-tint);color:var(--indigo-dark);border:none;border-radius:999px;
+    padding:8px 14px;font-weight:700;font-size:14px;cursor:pointer;
+  }
+  .num-chip:hover{background:var(--indigo);color:#fff;}
+  .num-chip:disabled{opacity:.4;cursor:not-allowed;}
+  .workspace-hint{font-size:13px;color:var(--muted);margin-top:14px;line-height:1.6;}
+  .active-story-pill{
+    display:inline-block;background:#fff;border:1.5px solid var(--indigo);color:var(--indigo-dark);
+    border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;margin-bottom:14px;
+  }
+
+  .spinner{
+    width:16px;height:16px;border-radius:50%;border:2px solid #d8d5f8;border-top-color:var(--indigo);
+    display:inline-block;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><span class="mark">📐</span>Math<span class="dash">-to-</span>Story</div>
+  <div class="tagline">Learn math through real-world stories</div>
+</header>
+
+<main>
+
+  <!-- ============ GRID PAGE ============ -->
+  <section id="grid-page">
+    <h1 class="page-title">Choose a Concept to Explore</h1>
+    <p class="page-sub">Pick a topic and follow a real scenario where it's actually used.</p>
+    <div class="grid" id="story-grid"></div>
+
+    <hr class="section-divider">
+    <h2 class="section-heading">Add Your Own Story</h2>
+    <p class="section-sub">Build a custom multi-step scenario — it's added straight to the concept grid above and saved in this browser.</p>
+    <div class="util-card">
+      <form id="custom-story-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="cs-title">Story title</label>
+            <input type="text" id="cs-title" placeholder="e.g. Compound Interest" required>
+          </div>
+          <div class="field">
+            <label for="cs-category">Category</label>
+            <select id="cs-category">
+              <option value="geometry">Geometry</option>
+              <option value="statistics">Statistics</option>
+              <option value="algebra" selected>Algebra</option>
+              <option value="custom">Other</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="cs-icon">Card emoji <span class="hint">(one emoji shown on the grid card)</span></label>
+            <input type="text" id="cs-icon" maxlength="4" placeholder="💰" value="✨">
+          </div>
+          <div class="field full">
+            <label for="cs-summary">Grid card description</label>
+            <textarea id="cs-summary" placeholder="A short one or two sentence hook, shown on the concept card." required></textarea>
+          </div>
+          <div class="field full">
+            <label for="cs-scenario">Step 1 — The Scenario <span class="hint">wrap a variable in double braces, e.g. {{principal}}</span></label>
+            <textarea id="cs-scenario" placeholder="You deposit {{principal}} dollars at an annual rate of {{rate}} percent..." required></textarea>
+          </div>
+          <div class="field full">
+            <label for="cs-setup">Step 2 — Set Up the Formula (explanation text)</label>
+            <textarea id="cs-setup" placeholder="Explain, in plain words, why this formula models the scenario."></textarea>
+          </div>
+          <div class="field full">
+            <label for="cs-solve">Step 3 — Solve Step by Step (explanation text)</label>
+            <textarea id="cs-solve" placeholder="Walk through plugging the numbers in."></textarea>
+          </div>
+          <div class="field full">
+            <label for="cs-answer">Step 4 — answer intro text <span class="hint">shown above the computed result</span></label>
+            <textarea id="cs-answer" placeholder="So here's what that means for you:"></textarea>
+          </div>
+          <div class="field full">
+            <label for="cs-payoff">Step 5 — Real-World Payoff</label>
+            <textarea id="cs-payoff" placeholder="Where else this exact logic shows up in the real world." required></textarea>
+          </div>
+          <div class="field full">
+            <label for="cs-formula">Formula <span class="hint">mathjs expression using your variable names below, e.g. principal * (1 + rate/100)^years</span></label>
+            <input type="text" id="cs-formula" placeholder="principal * (1 + rate / 100) ^ years" required>
+          </div>
+          <div class="field full">
+            <label for="cs-result-label">Result label <span class="hint">e.g. "final balance"</span></label>
+            <input type="text" id="cs-result-label" placeholder="final balance" required>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label>Variables <span class="hint">name must match what you used in {{double braces}} and the formula</span></label>
+          <div class="var-rows" id="var-rows"></div>
+          <button type="button" class="small-btn" id="add-var-row">+ Add variable</button>
+        </div>
+
+        <button type="submit" class="primary-btn" style="margin-top:10px;">Add Story to Grid</button>
+        <div class="form-msg" id="cs-msg"></div>
+      </form>
+    </div>
+
+    <hr class="section-divider">
+    <h2 class="section-heading">Textbook Photo Upload</h2>
+    <p class="section-sub">Snap or drop a photo of a textbook problem — we'll OCR it and pull out the numbers so you can drop them straight into a story's variables.</p>
+    <div class="util-card">
+      <div class="upload-grid">
+        <div>
+          <div class="dropzone" id="dropzone">
+            <span class="dz-icon">📷</span>
+            <div><strong>Drop an image here</strong> or click to browse</div>
+            <div class="hint" style="margin-top:6px;">PNG or JPG, up to 8MB</div>
+            <input type="file" id="file-input" accept="image/*">
+          </div>
+          <img id="image-preview" alt="Uploaded problem preview">
+        </div>
+        <div class="workspace-panel">
+          <h4>Extracted Numbers</h4>
+          <div id="active-story-indicator"></div>
+          <div id="ocr-status" class="hint">Upload an image to scan it for numbers.</div>
+          <div id="ocr-text-wrap" style="display:none;">
+            <div class="ocr-text" id="ocr-text"></div>
+          </div>
+          <div class="num-chips" id="num-chips"></div>
+          <div class="workspace-hint">Open a story first, then click a number here to drop it into that story's next empty variable — everything recalculates automatically.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STORY / WIZARD PAGE ============ -->
+  <section id="story-page">
+    <button class="back-link" id="back-btn">← Back to concepts</button>
+
+    <div class="story-header">
+      <span class="tag" id="story-tag"></span>
+      <h1 id="story-title"></h1>
+      <p class="story-summary" id="story-summary"></p>
+    </div>
+
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="step-card" id="steps-container"><!-- step panes injected here --></div>
+
+    <div class="wizard-nav">
+      <button class="nav-btn ghost" id="prev-btn">← Prev</button>
+      <div class="dots" id="dots"></div>
+      <div>
+        <button class="nav-btn solid" id="next-btn">Next →</button>
+        <button class="nav-btn finish" id="finish-btn" style="display:none;">Finish ✓</button>
+      </div>
+    </div>
+    <div class="finish-banner" id="finish-banner">🎉 Nice work — you walked the full story through to its real-world payoff.</div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  const STEP_TITLES = ['The Scenario', 'Set Up the Formula', 'Solve Step by Step', 'Check Your Answer', 'Real-World Payoff'];
+  const CATEGORY_LABELS = { geometry:'GEOMETRY', statistics:'STATISTICS', algebra:'ALGEBRA', custom:'CUSTOM' };
+  const LS_KEY = 'mathToStoryCustomStories';
+
+  // ---------------------------------------------------------------
+  // Built-in stories. Each variable gets an editable mid-sentence
+  // input the first time it appears ({{input:name}}); every later
+  // mention uses {{mirror:name}} (read-only, kept in sync). {{result}}
+  // is the live, server-computed answer.
+  // ---------------------------------------------------------------
+  const BUILTIN_STORIES = [
+    {
+      id: 'trigonometry',
+      category: 'geometry',
+      icon: '🌳',
+      title: 'Trigonometry',
+      summary: "You want to measure the height of a huge tree without climbing it. Here's how a park ranger does it with a single angle.",
+      resultLabel: 'tree height',
+      resultUnit: 'm',
+      formula: 'distance * tan(angle * pi / 180)',
+      variables: [
+        { name:'distance', label:'distance from the base', unit:'m', default:20 },
+        { name:'angle', label:'angle of elevation', unit:'°', default:35 }
+      ],
+      scenario: "You're standing {{input:distance}} meters from the base of a huge tree. Using a clinometer, you measure the angle up to the very top at {{input:angle}} degrees. You want the height — without climbing anything.",
+      setup: "A right triangle forms between you, the base of the tree, and its top. The angle you measured, the flat distance you're standing at, and the tree's height are related by the tangent function: height = distance × tan(angle). tan converts an angle into the ratio of \"opposite over adjacent\" — exactly the ratio between the tree's height and your distance from it.",
+      solve: "Plug your numbers straight into the formula: height = {{mirror:distance}} × tan({{mirror:angle}}°). Because tan grows as the angle climbs toward 90°, a steeper sightline means a taller tree for the same distance.",
+      answerIntro: "Here's what that comes out to:",
+      payoff: "This exact technique — one distance, one angle, one tangent — is how surveyors size up buildings, how ship navigators fix a lighthouse's height, and how ballistics and flight-path calculations track something too tall, too far, or too dangerous to measure directly."
+    },
+    {
+      id: 'probability',
+      category: 'statistics',
+      icon: '🎲',
+      title: 'Probability',
+      summary: "Your favorite team just won 7 of their last 10 games. What are the odds they win the next one too?",
+      resultLabel: 'estimated win probability',
+      resultUnit: '',
+      formula: 'wins / total',
+      variables: [
+        { name:'wins', label:'games won', unit:'', default:7 },
+        { name:'total', label:'games played', unit:'', default:10 }
+      ],
+      scenario: "Your favorite team won {{input:wins}} of their last {{input:total}} games. Nothing else has changed about the roster or schedule. What's a reasonable estimate for the odds they win the next one too?",
+      setup: "With no extra information, the simplest honest estimate is the empirical probability: wins ÷ total games played. It treats the recent record as your best guess at the team's true underlying win rate.",
+      solve: "So the estimate is win rate = {{mirror:wins}} ÷ {{mirror:total}}. That fraction becomes your probability that the next game, taken in isolation, ends in a win.",
+      answerIntro: "Estimated chance they win the next game:",
+      payoff: "This exact logic — count the successes, divide by the trials — powers sports betting odds, weather forecasts (\"70% chance of rain\"), and A/B testing in tech companies deciding which app feature to launch."
+    },
+    {
+      id: 'quadratic-equations',
+      category: 'algebra',
+      icon: '🚀',
+      title: 'Quadratic Equations',
+      summary: "An engineer needs to know exactly when a launched rocket will hit the ground, given its launch speed, angle, and starting height.",
+      resultLabel: 'time until impact',
+      resultUnit: 's',
+      formula: '(-b - sqrt(b^2 - 4*a*c)) / (2*a)',
+      variables: [
+        { name:'a', label:'gravity term (a)', unit:'', default:-4.9 },
+        { name:'b', label:'initial vertical speed (b)', unit:'m/s', default:30 },
+        { name:'c', label:'launch height (c)', unit:'m', default:2 }
+      ],
+      scenario: "An engineer models a rocket's height over time with h(t) = {{input:a}}t² + {{input:b}}t + {{input:c}}, where a captures gravity's pull, b is the initial upward speed, and c is the height it launches from. She needs to know exactly when h(t) returns to zero — the moment it hits the ground.",
+      setup: "Height hitting zero means solving the quadratic {{mirror:a}}t² + {{mirror:b}}t + {{mirror:c}} = 0 for t. The quadratic formula gives the two moments where the parabola crosses the ground: t = (−b ± √(b² − 4ac)) / (2a). Since a (gravity) is negative here, it's the \"−\" branch that lands on the later, physically meaningful moment — when the rocket comes back down.",
+      solve: "Plugging in: t = (−{{mirror:b}} − √({{mirror:b}}² − 4×{{mirror:a}}×{{mirror:c}})) / (2×{{mirror:a}}). Everything under the square root — the discriminant — tells her the rocket does come back down at all (a positive value means two real crossing times).",
+      answerIntro: "Time until the rocket hits the ground:",
+      payoff: "This is the same quadratic-formula logic behind projectile motion in physics, trajectory planning in aerospace engineering, and even the parabolic arcs that game engines compute for a thrown grenade or a jump shot."
+    },
+    {
+      id: 'linear-equations',
+      category: 'algebra',
+      icon: '📊',
+      title: 'Linear Equations',
+      summary: "A rideshare app charges a flat pickup fee plus a rate per mile. Given a rider's budget, how far can they actually go?",
+      resultLabel: 'maximum distance',
+      resultUnit: 'mi',
+      formula: '(budget - fee) / rate',
+      variables: [
+        { name:'fee', label:'flat pickup fee', unit:'$', default:3 },
+        { name:'rate', label:'cost per mile', unit:'$/mi', default:2.25 },
+        { name:'budget', label:'rider budget', unit:'$', default:25 }
+      ],
+      scenario: "A rideshare app charges a flat pickup fee of {{input:fee}} dollars, plus {{input:rate}} dollars for every mile driven. A rider only has {{input:budget}} dollars to spend on the trip. How far can they actually go before the meter eats their whole budget?",
+      setup: "Total cost grows in a straight line with distance: cost = fee + rate × miles. That's a linear equation — every extra mile adds exactly the same amount, no matter how many miles came before it. To find the farthest they can go, set cost equal to their budget and solve for miles.",
+      solve: "budget = fee + rate × miles, so miles = (budget − fee) ÷ rate = ({{mirror:budget}} − {{mirror:fee}}) ÷ {{mirror:rate}}. Notice this is just \"isolate the variable\" — the core move behind every linear equation.",
+      answerIntro: "Farthest the rider can go on that budget:",
+      payoff: "The same rearrange-and-isolate move prices phone plans with a base fee plus per-gigabyte overage, sets shipping costs with a handling fee plus per-pound rate, and underlies every straight-line budget forecast in a spreadsheet."
+    }
+  ];
+
+  // ---------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------
+  let ALL_STORIES = [];               // builtin + custom, rendered to the grid
+  let activeStory = null;             // the story object currently open in the wizard
+  let activeStoryState = null;        // { variables: {name:value}, result: number|null }
+  let activeStepIndex = 0;
+  const debounceTimers = {};          // one timer per story id
+
+  function loadCustomStories(){
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch(e){ return []; }
+  }
+  function saveCustomStories(list){
+    localStorage.setItem(LS_KEY, JSON.stringify(list));
+  }
+
+  function initialVariableState(story){
+    const vars = {};
+    story.variables.forEach(v => { vars[v.name] = v.default; });
+    return vars;
+  }
+
+  // ---------------------------------------------------------------
+  // Token rendering: {{input:x}} -> editable inline input
+  //                  {{mirror:x}} -> read-only synced span
+  //                  {{result}}   -> read-only synced result span
+  // ---------------------------------------------------------------
+  function renderTokens(text, story, vars){
+    return text
+      .replace(/\{\{input:(\w+)\}\}/g, (_, name) => {
+        const val = vars[name];
+        return `<input type="number" step="any" inputmode="decimal" class="inline-input" `
+             + `data-story="${story.id}" data-var="${name}" data-mirror="${story.id}:${name}" `
+             + `value="${val}" aria-label="${name}">`;
+      })
+      .replace(/\{\{mirror:(\w+)\}\}/g, (_, name) => {
+        const val = vars[name];
+        return `<span class="mirror" data-mirror="${story.id}:${name}">${val}</span>`;
+      })
+      .replace(/\{\{result\}\}/g, () => {
+        return `<span class="mirror result-value" data-mirror="${story.id}:result">…</span>`;
+      });
+  }
+
+  function buildFormulaPanel(story, vars){
+    const varList = story.variables.map(v =>
+      `<span class="mirror" data-mirror="${story.id}:${v.name}">${vars[v.name]}</span>${v.unit ? ' '+v.unit : ''}`
+    ).join(' &nbsp;·&nbsp; ');
+    return `<div class="formula-panel">
+      <span class="fp-label">Formula</span>
+      <div class="fp-live">${story.resultLabel} = ${story.formula}</div>
+      <div style="margin-top:10px;color:#6b6f85;font-size:13px;">Current values: ${varList}</div>
+    </div>`;
+  }
+
+  function buildAnswerBox(story){
+    return `<div class="answer-box">
+      <div class="big"><span class="mirror result-value" data-mirror="${story.id}:result">…</span> ${story.resultUnit || ''}</div>
+      <div class="sub">${story.resultLabel}<span class="status-pill" id="status-${story.id}">solving…</span></div>
+    </div>`;
+  }
+
+  function buildSteps(story, vars){
+    const panes = [];
+
+    panes.push(`<p>${renderTokens(story.scenario, story, vars)}</p>`);
+
+    panes.push(`<p>${renderTokens(story.setup || '', story, vars)}</p>${buildFormulaPanel(story, vars)}`);
+
+    panes.push(`<p>${renderTokens(story.solve || '', story, vars)}</p>${buildFormulaPanel(story, vars)}`);
+
+    panes.push(`<p>${story.answerIntro || "Here's what that comes out to:"}</p>${buildAnswerBox(story)}`);
+
+    panes.push(`<div class="payoff-box">${story.payoff}</div>`);
+
+    return panes;
+  }
+
+  // ---------------------------------------------------------------
+  // Grid rendering
+  // ---------------------------------------------------------------
+  function renderGrid(){
+    const custom = loadCustomStories();
+    ALL_STORIES = BUILTIN_STORIES.concat(custom);
+    const grid = document.getElementById('story-grid');
+    grid.innerHTML = '';
+    ALL_STORIES.forEach(story => {
+      const el = document.createElement('div');
+      el.className = 'card' + (story.isCustom ? ' remove-btn' : '');
+      el.tabIndex = 0;
+      el.setAttribute('role','button');
+      el.innerHTML = `
+        <span class="icon">${story.icon || '✨'}</span>
+        <span class="tag ${story.category}">${CATEGORY_LABELS[story.category] || story.category.toUpperCase()}</span>
+        <h3>${escapeHtml(story.title)}</h3>
+        <p>${escapeHtml(story.summary)}</p>
+        ${story.isCustom ? '<button class="delete-x" title="Remove this story" aria-label="Remove story">✕</button>' : ''}
+      `;
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.delete-x')) return; // handled separately
+        openStory(story.id);
+      });
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStory(story.id); }
+      });
+      const del = el.querySelector('.delete-x');
+      if (del) {
+        del.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const remaining = loadCustomStories().filter(s => s.id !== story.id);
+          saveCustomStories(remaining);
+          renderGrid();
+        });
+      }
+      grid.appendChild(el);
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : str;
+    return div.innerHTML;
+  }
+
+  // ---------------------------------------------------------------
+  // Wizard / story page
+  // ---------------------------------------------------------------
+  function openStory(id){
+    const story = ALL_STORIES.find(s => s.id === id);
+    if (!story) return;
+
+    activeStory = story;
+    activeStoryState = { variables: initialVariableState(story), result: null };
+    activeStepIndex = 0;
+
+    document.getElementById('story-tag').textContent = CATEGORY_LABELS[story.category] || story.category.toUpperCase();
+    document.getElementById('story-tag').className = 'tag ' + story.category;
+    document.getElementById('story-title').innerHTML = `<span>${story.icon || ''}</span> ${escapeHtml(story.title)}`;
+    document.getElementById('story-summary').textContent = story.summary;
+
+    const panes = buildSteps(story, activeStoryState.variables);
+    const container = document.getElementById('steps-container');
+    container.innerHTML = panes.map((html, i) => `
+      <div class="step-pane ${i===0 ? 'active' : ''}" data-step="${i}">
+        <div class="step-meta">Step ${i+1} of ${panes.length}</div>
+        <h2 class="step-title">${STEP_TITLES[i]}</h2>
+        <div class="step-body">${html}</div>
+      </div>
+    `).join('');
+
+    const dots = document.getElementById('dots');
+    dots.innerHTML = panes.map((_, i) => `<span class="dot ${i===0 ? 'active' : ''}" data-dot="${i}"></span>`).join('');
+
+    document.getElementById('finish-banner').classList.remove('show');
+    updateNavState();
+
+    document.getElementById('grid-page').style.display = 'none';
+    document.getElementById('story-page').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+
+    // Solve once immediately so the answer isn't blank on arrival.
+    solveStory(story.id);
+    updateActiveStoryIndicator();
+  }
+
+  function closeStory(){
+    activeStory = null;
+    activeStoryState = null;
+    document.getElementById('story-page').style.display = 'none';
+    document.getElementById('grid-page').style.display = 'block';
+    updateActiveStoryIndicator();
+  }
+
+  function totalSteps(){ return document.querySelectorAll('.step-pane').length; }
+
+  function showStep(index){
+    const total = totalSteps();
+    activeStepIndex = Math.max(0, Math.min(index, total - 1));
+
+    document.querySelectorAll('.step-pane').forEach(pane => {
+      pane.classList.toggle('active', Number(pane.dataset.step) === activeStepIndex);
+    });
+    document.querySelectorAll('.dot').forEach(dot => {
+      dot.classList.toggle('active', Number(dot.dataset.dot) === activeStepIndex);
+    });
+    document.getElementById('progress-fill').style.width = (((activeStepIndex+1)/total) * 100) + '%';
+    updateNavState();
+  }
+
+  function updateNavState(){
+    const total = totalSteps();
+    document.getElementById('prev-btn').disabled = activeStepIndex === 0;
+    const isLast = activeStepIndex === total - 1;
+    document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+    document.getElementById('finish-btn').style.display = isLast ? 'inline-block' : 'none';
+  }
+
+  document.getElementById('back-btn').addEventListener('click', closeStory);
+  document.getElementById('prev-btn').addEventListener('click', () => showStep(activeStepIndex - 1));
+  document.getElementById('next-btn').addEventListener('click', () => showStep(activeStepIndex + 1));
+  document.getElementById('finish-btn').addEventListener('click', () => {
+    document.getElementById('finish-banner').classList.add('show');
+  });
+  document.getElementById('dots').addEventListener('click', (e) => {
+    const dot = e.target.closest('.dot');
+    if (dot) showStep(Number(dot.dataset.dot));
+  });
+
+  // ---------------------------------------------------------------
+  // Live mirroring + 250ms debounced solve
+  // Pre-rendered DOM only — navigating steps never touches the network
+  // and typing never gets re-rendered out from under the cursor.
+  // ---------------------------------------------------------------
+  function updateMirrors(storyId, varName, rawValue){
+    document.querySelectorAll(`[data-mirror="${storyId}:${varName}"]`).forEach(el => {
+      if (el.tagName === 'INPUT') {
+        if (document.activeElement !== el) el.value = rawValue;
+      } else {
+        el.textContent = rawValue;
+      }
+    });
+  }
+
+  function updateResultMirrors(storyId, value){
+    document.querySelectorAll(`[data-mirror="${storyId}:result"]`).forEach(el => {
+      el.textContent = value;
+    });
+  }
+
+  function setSolvingIndicator(storyId, solving){
+    const pill = document.getElementById('status-' + storyId);
+    if (!pill) return;
+    pill.textContent = solving ? 'solving…' : '';
+    pill.classList.toggle('show', solving);
+  }
+
+  async function solveStory(storyId){
+    const story = ALL_STORIES.find(s => s.id === storyId);
+    if (!story || !activeStoryState) return;
+    setSolvingIndicator(storyId, true);
+    try {
+      const res = await fetch('/api/solve-story', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formula: story.formula, variables: activeStoryState.variables })
+      });
+      const data = await res.json();
+      if (data.success) {
+        activeStoryState.result = data.result;
+        updateResultMirrors(storyId, data.result);
+      } else {
+        updateResultMirrors(storyId, '—');
+      }
+    } catch (err) {
+      updateResultMirrors(storyId, '—');
+    } finally {
+      setSolvingIndicator(storyId, false);
+    }
+  }
+
+  // Event delegation: catches inputs from every pre-rendered pane,
+  // including ones not currently visible.
+  document.getElementById('steps-container').addEventListener('input', (e) => {
+    const el = e.target;
+    if (!el.classList.contains('inline-input')) return;
+    const storyId = el.dataset.story;
+    const varName = el.dataset.var;
+    let value = parseFloat(el.value);
+    if (Number.isNaN(value)) value = 0;
+
+    if (activeStoryState) activeStoryState.variables[varName] = value;
+    updateMirrors(storyId, varName, el.value === '' ? '' : value);
+
+    clearTimeout(debounceTimers[storyId]);
+    debounceTimers[storyId] = setTimeout(() => solveStory(storyId), 250);
+  });
+
+  // ---------------------------------------------------------------
+  // Custom story builder
+  // ---------------------------------------------------------------
+  function addVarRow(name, label, unit, def){
+    const row = document.createElement('div');
+    row.className = 'var-row';
+    row.innerHTML = `
+      <input type="text" class="v-name" placeholder="name (e.g. rate)" value="${name || ''}">
+      <input type="text" class="v-label" placeholder="label (e.g. annual rate)" value="${label || ''}">
+      <input type="text" class="v-unit" placeholder="unit" value="${unit || ''}">
+      <input type="number" step="any" class="v-default" placeholder="default" value="${def != null ? def : ''}">
+      <button type="button" class="icon-btn" title="Remove variable">✕</button>
+    `;
+    row.querySelector('.icon-btn').addEventListener('click', () => row.remove());
+    document.getElementById('var-rows').appendChild(row);
+  }
+  document.getElementById('add-var-row').addEventListener('click', () => addVarRow());
+  // start with two blank rows to make the form self-explanatory
+  addVarRow('', '', '', '');
+  addVarRow('', '', '', '');
+
+  document.getElementById('custom-story-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('cs-msg');
+    msg.textContent = '';
+    msg.className = 'form-msg';
+
+    const title = document.getElementById('cs-title').value.trim();
+    const category = document.getElementById('cs-category').value;
+    const icon = document.getElementById('cs-icon').value.trim() || '✨';
+    const summary = document.getElementById('cs-summary').value.trim();
+    const scenario = document.getElementById('cs-scenario').value.trim();
+    const setup = document.getElementById('cs-setup').value.trim();
+    const solve = document.getElementById('cs-solve').value.trim();
+    const answerIntro = document.getElementById('cs-answer').value.trim();
+    const payoff = document.getElementById('cs-payoff').value.trim();
+    const formula = document.getElementById('cs-formula').value.trim();
+    const resultLabel = document.getElementById('cs-result-label').value.trim();
+
+    const rows = Array.from(document.querySelectorAll('.var-row'));
+    const variables = rows.map(r => ({
+      name: r.querySelector('.v-name').value.trim(),
+      label: r.querySelector('.v-label').value.trim(),
+      unit: r.querySelector('.v-unit').value.trim(),
+      default: parseFloat(r.querySelector('.v-default').value)
+    })).filter(v => v.name);
+
+    if (!title || !summary || !scenario || !payoff || !formula || !resultLabel) {
+      msg.textContent = 'Please fill in the required fields (title, description, scenario, payoff, formula, result label).';
+      msg.classList.add('err');
+      return;
+    }
+    if (variables.length === 0) {
+      msg.textContent = 'Add at least one variable.';
+      msg.classList.add('err');
+      return;
+    }
+    for (const v of variables) {
+      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(v.name)) {
+        msg.textContent = `Variable name "${v.name}" isn't valid — use letters, numbers, and underscores, starting with a letter.`;
+        msg.classList.add('err');
+        return;
+      }
+      if (Number.isNaN(v.default)) v.default = 0;
+    }
+
+    // Wrap the FIRST mention of each variable in {{input:x}}, later
+    // mentions the author wrote as {{x}} become {{mirror:x}} automatically.
+    function normalize(text){
+      let seen = {};
+      return text.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, name) => {
+        if (!variables.some(v => v.name === name)) return `{{${name}}}`;
+        if (!seen[name]) { seen[name] = true; return `{{input:${name}}}`; }
+        return `{{mirror:${name}}}`;
+      });
+    }
+
+    const id = 'custom-' + title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g,'') + '-' + Date.now().toString(36);
+
+    const story = {
+      id, category, icon, title, summary,
+      resultLabel, resultUnit: '',
+      formula, variables,
+      scenario: normalize(scenario),
+      setup: normalize(setup || 'Here is how the pieces of this scenario fit into one formula.'),
+      solve: normalize(solve || 'Plugging the numbers into the formula gives the following.'),
+      answerIntro: answerIntro || "Here's what that comes out to:",
+      payoff,
+      isCustom: true
+    };
+
+    const list = loadCustomStories();
+    list.push(story);
+    saveCustomStories(list);
+    renderGrid();
+
+    msg.textContent = `"${title}" was added to the concept grid above.`;
+    msg.classList.add('ok');
+    e.target.reset();
+    document.getElementById('var-rows').innerHTML = '';
+    addVarRow('', '', '', '');
+    addVarRow('', '', '', '');
+    document.getElementById('cs-category').value = 'algebra';
+    document.getElementById('cs-icon').value = '✨';
+  });
+
+  // ---------------------------------------------------------------
+  // Textbook photo upload -> OCR -> numeric chips -> drop into story
+  // ---------------------------------------------------------------
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const imagePreview = document.getElementById('image-preview');
+  const ocrStatus = document.getElementById('ocr-status');
+  const ocrTextWrap = document.getElementById('ocr-text-wrap');
+  const ocrTextEl = document.getElementById('ocr-text');
+  const chipsEl = document.getElementById('num-chips');
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleImageFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files && fileInput.files[0]) handleImageFile(fileInput.files[0]);
+  });
+
+  function handleImageFile(file){
+    if (!file.type.startsWith('image/')) {
+      ocrStatus.textContent = 'That file is not an image.';
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    imagePreview.src = url;
+    imagePreview.style.display = 'block';
+
+    ocrStatus.innerHTML = '<span class="spinner"></span> Scanning image for numbers…';
+    ocrTextWrap.style.display = 'none';
+    chipsEl.innerHTML = '';
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch('/api/upload-math-image', { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          ocrStatus.textContent = 'Could not read that image: ' + (data.error || 'unknown error');
+          return;
+        }
+        ocrStatus.textContent = data.numbers.length
+          ? `Found ${data.numbers.length} number${data.numbers.length===1?'':'s'} in the image.`
+          : 'Scanned the image, but no numbers were recognized.';
+        if (data.text) {
+          ocrTextEl.textContent = data.text;
+          ocrTextWrap.style.display = 'block';
+        }
+        chipsEl.innerHTML = '';
+        data.numbers.forEach(num => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'num-chip';
+          chip.textContent = num;
+          chip.addEventListener('click', () => assignNumberToActiveStory(num));
+          chipsEl.appendChild(chip);
+        });
+      })
+      .catch(() => {
+        ocrStatus.textContent = 'Upload failed — check your connection and try again.';
+      });
+  }
+
+  function updateActiveStoryIndicator(){
+    const box = document.getElementById('active-story-indicator');
+    if (activeStory) {
+      box.innerHTML = `<span class="active-story-pill">Active story: ${escapeHtml(activeStory.title)}</span>`;
+    } else {
+      box.innerHTML = '';
+    }
+  }
+
+  function assignNumberToActiveStory(num){
+    if (!activeStory || !activeStoryState) {
+      ocrStatus.textContent = 'Open a story first, then click a number to drop it in.';
+      return;
+    }
+    // Find the first variable whose input is still at its default,
+    // otherwise just fill the first variable.
+    const target = activeStory.variables.find(v => activeStoryState.variables[v.name] === v.default)
+                 || activeStory.variables[0];
+    if (!target) return;
+
+    activeStoryState.variables[target.name] = num;
+    updateMirrors(activeStory.id, target.name, num);
+    // Also push the value into the actual <input> elements (even if focused
+    // elsewhere) since this is an explicit user action, not typing.
+    document.querySelectorAll(`input.inline-input[data-mirror="${activeStory.id}:${target.name}"]`)
+      .forEach(el => { el.value = num; });
+
+    clearTimeout(debounceTimers[activeStory.id]);
+    debounceTimers[activeStory.id] = setTimeout(() => solveStory(activeStory.id), 250);
+  }
+
+  // ---------------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------------
+  renderGrid();
+  updateActiveStoryIndicator();
+})();
+</script>
+</body>
+</html>
