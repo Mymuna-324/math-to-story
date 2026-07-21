@@ -15,6 +15,19 @@
 * 🏠 **Home Page:** [https://math-to-story.onrender.com](https://math-to-story.onrender.com)
 
 ---
+
+## 🔄 User Navigation Flow
+
+1. **Authentication (`login.html`):** Users enter their email and password to log in. Session flag is set in `localStorage`.
+2. **Home Page (`index.html`):** Explore concepts (Geometry, Statistics, Algebra) with direct navigation to Login/Dashboard.
+3. **Guarded Dashboard (`dashboard.html`):** 
+   - *Security Check:* Redirects unauthenticated users back to `login.html`.
+   - *Interactive Widgets:*
+     1. 🧠 **Daily Math Quiz Widget**
+     2. 🎮 **Gamification Widget (XP & Levels)**
+     3. 📐 **Trigonometry Interactive Simulator**
+     4. 🔥 **Active Streak & Badges**
+
 ---
 
 ## ✨ Features
@@ -30,6 +43,8 @@
 
 - **Frontend:** HTML5, CSS3, JavaScript (ES6)
 - **Backend:** Node.js, Express.js
+* **State Management:** Browser `localStorage`
+* **Hosting:** Render & Netlify
 - **Deployment:** Netlify (Frontend), Render (Backend)
 - **Version Control:** Git & GitHub
 
