@@ -8,7 +8,13 @@
 
 - **Frontend (Netlify):** [https://math-to-story.netlify.app](https://math-to-story.netlify.app)
 - **Backend (Render):** [https://math-to-story.onrender.com](https://math-to-story.onrender.com)
+## 🔗 Live Application Links
 
+* 🔑 **Login Page (Start Here):** [https://math-to-story.onrender.com/login.html](https://math-to-story.onrender.com/login.html)
+* 📊 **Dashboard (Guarded):** [https://math-to-story.onrender.com/dashboard.html](https://math-to-story.onrender.com/dashboard.html)
+* 🏠 **Home Page:** [https://math-to-story.onrender.com](https://math-to-story.onrender.com)
+
+---
 ---
 
 ## ✨ Features
