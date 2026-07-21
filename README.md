@@ -59,3 +59,49 @@ To run this project locally on your machine, follow these steps:
    git clone [https://github.com/Mymuna-324/math-to-story.git](https://github.com/Mymuna-324/math-to-story.git)
    cd math-to-story
    ```
+## 🏗️ Project Architecture
++-------------------------------------------------------------------+
+|                        Client Browser                             |
++-------------------------------------------------------------------+
+|                                          |
+v                                          v
+[ index.html ]                           [ login.html ]
+(Landing Page)                           (Authentication)
+|                                          |
+| Navigates to                             | Saves Session &
+v                                          | Username
+[ dashboard.html ] <------------------------------+
+(Protected Dashboard)  (localStorage Check: isLoggedIn === "true")
+|
++---> 🧠 Daily Math Quiz Widget
++---> 🎮 Gamification Widget (XP & Level)
++---> 📐 Trigonometry Simulator
++---> 🔥 Active Streak & Badges
+
+
+### ⚙️ Component Flow:
+1. **Landing & Discovery (`index.html`):** Public entry point introducing concepts.
+2. **Auth Layer (`login.html`):** Validates input, derives display username, sets `localStorage.setItem("isLoggedIn", "true")`.
+3. **Auth Guard & State Check (`dashboard.html`):** Instant script check in `<head>`. Redirects to `login.html` if unauthenticated.
+4. **Interactive Dashboard Core:** Initializes 4 client-side widgets using vanilla JavaScript DOM events and reactive state updating.
+
+
+Markdown
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    A[User visits Site] --> B{isLoggedIn in localStorage?}
+    B -- No --> C[login.html]
+    C -->|Enter Credentials| D[Set isLoggedIn & Username]
+    D --> E[dashboard.html]
+    B -- Yes --> E
+    
+    subgraph Dashboard Page
+        E --> F[Auth Guard Verification]
+        F --> G[Quiz Widget]
+        F --> H[Gamification Engine]
+        F --> I[Trig Simulator]
+        F --> J[Streak Tracker]
+    end
+```
